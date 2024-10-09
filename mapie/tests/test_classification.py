@@ -1460,25 +1460,25 @@ def test_toy_dataset_predictions(strategy: str) -> None:
 @pytest.mark.parametrize("strategy", ["aps_randomized_cv_crossval"])
 def test_toy_dataset_predictions_aps_randomized_cv_crossval(strategy: str) -> None:
     """Test prediction sets estimated by MapieClassifier on a toy dataset"""
-    
-    args_init, args_predict = STRATEGIES[strategy]
-    if "split" not in strategy:
-        clf = LogisticRegression().fit(X_toy, y_toy)
-    else:
-        clf = LogisticRegression()
-    mapie_clf = MapieClassifier(estimator=clf, **args_init)
-    mapie_clf.fit(X_toy, y_toy, size_raps=0.5)
-    _, y_ps = mapie_clf.predict(
-        X_toy,
-        alpha=0.5,
-        include_last_label=args_predict["include_last_label"],
-        agg_scores=args_predict["agg_scores"]
-    )
-    np.testing.assert_allclose(y_ps[:, :, 0], y_toy_mapie[strategy])
-    np.testing.assert_allclose(
-        classification_coverage_score(y_toy, y_ps[:, :, 0]),
-        COVERAGES[strategy],
-    )
+    for i in range(10000):
+        args_init, args_predict = STRATEGIES[strategy]
+        if "split" not in strategy:
+            clf = LogisticRegression().fit(X_toy, y_toy)
+        else:
+            clf = LogisticRegression()
+        mapie_clf = MapieClassifier(estimator=clf, **args_init)
+        mapie_clf.fit(X_toy, y_toy, size_raps=0.5)
+        _, y_ps = mapie_clf.predict(
+            X_toy,
+            alpha=0.5,
+            include_last_label=args_predict["include_last_label"],
+            agg_scores=args_predict["agg_scores"]
+        )
+        np.testing.assert_allclose(y_ps[:, :, 0], y_toy_mapie[strategy])
+        np.testing.assert_allclose(
+            classification_coverage_score(y_toy, y_ps[:, :, 0]),
+            COVERAGES[strategy],
+        )
 
 @pytest.mark.parametrize("strategy", [*LARGE_COVERAGES])
 def test_large_dataset_predictions(strategy: str) -> None:
